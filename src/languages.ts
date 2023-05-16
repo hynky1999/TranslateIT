@@ -9,6 +9,6 @@ export const languages: Language[] = [
   { code: 'cs', name: 'cs-CZ', readableName: 'Czech' },
 ];
 
-export const getByCode = (code: string): Language => {
-    return languages.find((language) => language.code === code) || languages[0];
+export const getByCode = (code: string): Language | undefined => {
+    return languages.find((language) => language.code === code);
 }

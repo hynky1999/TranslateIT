@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Text Translator",
+  "name": "TranslateIt",
+  "description": " TranslateIT: extension for translation. Highlight text, click the button, and get a translation.",
   "version": "1.0",
   "action": {
     "default_popup": "index.html",
