@@ -19,3 +19,8 @@ I also use development mode for react styling, so you can run:
 ```bash
 npm run dev
 ```
+
+### Misc
+Yes, I know it exposes both of my api keys. Frankly it's incredibly hard to hide them in chrome extension. One
+way would be to put it in lamdba an call them from chrome extension, but guess what, I still need to provide
+access from the extension to lambda. Since both keys are for free version, IDC.
