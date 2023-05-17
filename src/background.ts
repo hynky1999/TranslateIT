@@ -1,12 +1,28 @@
-import type { Language, TranslateMessage } from './types';
+import type { Language, TTSMessage, TranslateMessage } from './types';
 import { getLanguageByCode } from './languages';
 
 chrome.runtime.onInstalled.addListener(() => {
 
+  // Create a parent menu
+  chrome.contextMenus.create({
+    id: 'parent',
+    title: 'TranslateIT',
+    contexts: ['selection'],
+  });
+
+  // Create a child menu for translation
   chrome.contextMenus.create({
     id: 'translateSelectedText',
-
+    parentId: 'parent',
     title: 'Translate Text',
+    contexts: ['selection'],
+  });
+
+  // Create a child menu for text-to-speech
+  chrome.contextMenus.create({
+    id: 'ttsSelectedText',
+    parentId: 'parent',
+    title: 'Text to Speech',
     contexts: ['selection'],
   });
 
@@ -14,13 +30,23 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  const tabId = tab?.id
+  if (!tabId) {
+    return;
+  }
   if (info.menuItemId === 'translateSelectedText') {
-    if (!tab || tab.id === undefined) return;
-    const id = tab.id;
+    await resolveTranslate(tabId);
+  }
+  else if (info.menuItemId === 'ttsSelectedText') {
+    await resolveTTS(tabId);
+  }
+});
 
 
-    const {srcLang: srcLang, trgLang: targLang} = await new Promise<{ srcLang: string,
-      trgLang: string
+
+async function resolveTranslate(tabId: number){
+    const {srcLang, targLang } = await new Promise<{ srcLang: string,
+      targLang: string
     }>
     
     ((resolve) => {
@@ -30,7 +56,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       }, (items) => {
         resolve({
           srcLang: items.sourceLanguage,
-          trgLang: items.targetLanguage,
+          targLang: items.targetLanguage,
         }
         );
       });
@@ -41,6 +67,28 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
 
 
-      chrome.tabs.sendMessage(id, { action: 'translateSelectedText', message: translateMessage});
+      chrome.tabs.sendMessage(tabId, { action: 'translateSelectedText', message: translateMessage});
   }
-});
+
+async function resolveTTS(tabId: number){
+    const { srcLang } = await new Promise<{ srcLang: string }>
+    
+    ((resolve) => {
+      chrome.storage.sync.get({
+        sourceLanguage: 'auto',
+      }, (items) => {
+        resolve({
+          srcLang: items.sourceLanguage,
+        }
+        );
+      });
+    });
+    const ttsMessage = {
+      language: getLanguageByCode(srcLang) as Language,
+    } as TTSMessage;
+
+
+      chrome.tabs.sendMessage(tabId, { action: 'ttsSelectedText', message: ttsMessage});
+  }
+
+

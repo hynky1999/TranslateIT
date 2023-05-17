@@ -4,7 +4,7 @@ export async function translateText(text: string, sourceLanguage: Language, targ
   const apiKey = "3a22aa87-f1c6-2d6f-e30e-982746f58ab8:fx"
   const apiUrl = 'https://api-free.deepl.com/v2/translate';
   const source_arg = sourceLanguage.code !== 'auto' ? `&source_lang=${sourceLanguage.code}` : '';
-  const target_arg = targetLanguage.code !== 'auto' ? `&target_lang=${targetLanguage.code}` : '';
+  const target_arg = `&target_lang=${targetLanguage.code === 'auto' ? 'en' : targetLanguage.code}`;
 
 
   const response = await fetch(`${apiUrl}?auth_key=${apiKey}&text=${encodeURIComponent(text)}${source_arg}${target_arg}`);

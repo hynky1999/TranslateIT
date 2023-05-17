@@ -11,9 +11,11 @@ export async function runMicrosoftTTS(text: string, language: Language): Promise
 
     const speechConfig = SpeechConfig.fromSubscription(speechKey, serviceRegion);
     const audioConfig = AudioConfig.fromDefaultSpeakerOutput();
-    speechConfig.speechSynthesisLanguage = language.name;
-    if (voiceName){
-        speechConfig.speechSynthesisVoiceName = voiceName;
+    if (language.code !== 'auto') {
+        speechConfig.speechSynthesisLanguage = language.name
+        if (voiceName){
+            speechConfig.speechSynthesisVoiceName = voiceName;
+        }
     }
 
     const synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
@@ -22,11 +24,6 @@ export async function runMicrosoftTTS(text: string, language: Language): Promise
         text,
         result => {
             if (result.reason === ResultReason.SynthesizingAudioCompleted) {
-                // const audioData = result.audioData;
-                // const audioBlob = new Blob([audioData], { type: 'audio/wav' });
-                // const audioUrl = URL.createObjectURL(audioBlob);
-                // const audio = new Audio(audioUrl);
-                // audio.play();
             }
             synthesizer.close();
         },
