@@ -9,3 +9,7 @@ export interface TranslateMessage {
     readonly sourceLanguage: Language;
     readonly targetLanguage: Language;
 }
+
+export interface TTSMessage {
+    readonly language: Language;
+}

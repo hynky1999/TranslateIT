@@ -1,23 +1,46 @@
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import "./App.css";
-import type { Language, TranslateMessage } from './types';
-import {languages, getByCode} from './languages';
+import type { Language, TTSMessage, TranslateMessage } from './types';
+import {languages, getLanguageByCode} from './languages';
 import { useEffect, useState } from 'react';
+import { useMutation } from 'react-query';
 
 const Popup = () => {
   const [sourceLanguage, setSourceLanguage] = useState<Language['code']>("auto");
   const [targetLanguage, setTargetLanguage] = useState<Language['code']>("en");
+  const translateMutation = useMutation({
+    mutationFn: async ({sourceLanguage, targetLanguage}: { sourceLanguage: Language['code'], targetLanguage: Language['code']}) => {
+        await translate(sourceLanguage, targetLanguage);
+    }
+  });
+  const ttsMutation = useMutation({
+    mutationFn: async ({language}: { language: Language['code']}) => {
+        await runTTS(language);
+    }
+  });
+
+    
 
 
   const translate = async (src_lang: Language['code'], targ_lang: Language['code']) => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab.id === undefined) return;
     const translateMessage: TranslateMessage = {
-      sourceLanguage: getByCode(src_lang) || languages[0],
-      targetLanguage: getByCode(targ_lang) || languages[0],
+      sourceLanguage: getLanguageByCode(src_lang) || languages[0],
+      targetLanguage: getLanguageByCode(targ_lang) || languages[0],
     };
+    // Only content scripts can access the page DOM, thus we can't get the selected text here.
     chrome.tabs.sendMessage(tab.id, {action: "translateSelectedText", message:translateMessage});
   };
+
+  const runTTS = async (lang: Language['code']) => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab.id === undefined) return;
+    const ttsMessage: TTSMessage = {
+      language: getLanguageByCode(lang) || languages[0],
+    }
+    chrome.tabs.sendMessage(tab.id, {action: "ttsSelectedText", message: ttsMessage});
+  }
 
   useEffect(() => {
     try {
@@ -50,6 +73,7 @@ const Popup = () => {
     }
 
   }, [targetLanguage]);
+
 
   
 
@@ -87,8 +111,13 @@ const Popup = () => {
       </Row>
       <Row className="my-3">
         <Col>
-          <Button variant="primary" onClick={() => translate(sourceLanguage, targetLanguage) }>
+          <Button variant="primary" disabled={translateMutation.isLoading}
+           onClick={() => translateMutation.mutate({sourceLanguage, targetLanguage})
+            }>
             Translate
+          </Button>
+          <Button variant="primary" disabled={ttsMutation.isLoading} onClick={() => ttsMutation.mutate({language: targetLanguage}) }>
+            TTS
           </Button>
         </Col>
       </Row>

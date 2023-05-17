@@ -1,5 +1,5 @@
 import type { Language, TranslateMessage } from './types';
-import { getByCode } from './languages';
+import { getLanguageByCode } from './languages';
 
 chrome.runtime.onInstalled.addListener(() => {
 
@@ -36,8 +36,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       });
     });
     const translateMessage: TranslateMessage = {
-      sourceLanguage: getByCode(srcLang) as Language,
-      targetLanguage: getByCode(targLang) as Language,
+      sourceLanguage: getLanguageByCode(srcLang) as Language,
+      targetLanguage: getLanguageByCode(targLang) as Language,
     }
 
 
