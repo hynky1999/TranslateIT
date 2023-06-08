@@ -5,7 +5,7 @@ This is a chrome extension that allows you to translate and text on any website.
 I made this so that I can learn new languages by reading articles in that language. I hope you find it useful too.
 
 ### How to use
-The app is currently being reviewed by Google. Once it is approved, you can install it from the Chrome Web Store.
+Install the extension from [Google Store](https://chrome.google.com/webstore/detail/translateit/clbpcamdhbamnkdjlendehghgfjccfio)
 
 
 ### Building
